@@ -43,9 +43,9 @@ class Factory
      *
      * @return PageFrameDecorator
      */
-    static function decorate_root(Frame $root, Dompdf $dompdf)
+    static function decorate_root(Frame $root, Dompdf $dompdf, bool $continuous_frame = false)
     {
-        $frame = new PageFrameDecorator($root, $dompdf);
+        $frame = new PageFrameDecorator($root, $dompdf, $continuous_frame);
         $frame->set_reflower(new PageFrameReflower($frame));
         $root->set_decorator($frame);
 

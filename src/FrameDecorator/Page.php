@@ -35,6 +35,13 @@ class Page extends AbstractFrameDecorator
     protected $_page_full;
 
     /**
+     * Flag indicating to never break page (Continuous page)
+     *
+     * @var bool
+     */
+    protected $_page_continuous;
+
+    /**
      * Number of tables currently being reflowed
      *
      * @var int
@@ -63,10 +70,11 @@ class Page extends AbstractFrameDecorator
      * @param Frame $frame the frame to decorate
      * @param Dompdf $dompdf
      */
-    function __construct(Frame $frame, Dompdf $dompdf)
+    function __construct(Frame $frame, Dompdf $dompdf, bool $continuous_frame = false)
     {
         parent::__construct($frame, $dompdf);
         $this->_page_full = false;
+        $this->_page_continuous = $continuous_frame;
         $this->_in_table = 0;
         $this->bottom_page_edge = null;
     }
@@ -112,6 +120,16 @@ class Page extends AbstractFrameDecorator
     function is_full()
     {
         return $this->_page_full;
+    }
+
+    /**
+     * Returns true if the page is continuous and will never accept a break.
+     *
+     * @return bool
+     */
+    function is_continuous()
+    {
+        return $this->_page_continuous;
     }
 
     /**
@@ -163,6 +181,10 @@ class Page extends AbstractFrameDecorator
      */
     function check_forced_page_break(Frame $frame)
     {
+        if($this->_page_continuous) {
+            return false;
+        }
+
         // Skip check if page is already split and for the body
         if ($this->_page_full || $frame->get_node()->nodeName === "body") {
             return false;
@@ -533,6 +555,10 @@ class Page extends AbstractFrameDecorator
      */
     function check_page_break(Frame $frame)
     {
+        if($this->_page_continuous) {
+            return false;
+        }
+
         if ($this->_page_full || $frame->_already_pushed
             // Never check for breaks on empty text nodes
             || ($frame->is_text_node() && $frame->get_node()->nodeValue === "")

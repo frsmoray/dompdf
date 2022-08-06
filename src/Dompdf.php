@@ -674,7 +674,7 @@ class Dompdf
     /**
      * Renders the HTML to PDF
      */
-    public function render()
+    public function render(bool $continuous_frame = false)
     {
         $this->setPhpConfig();
 
@@ -723,7 +723,7 @@ class Dompdf
         $canvas = $this->canvas;
 
         $root_frame = $this->tree->get_root();
-        $root = Factory::decorate_root($root_frame, $this);
+        $root = Factory::decorate_root($root_frame, $this, $continuous_frame);
         foreach ($this->tree as $frame) {
             if ($frame === $root_frame) {
                 continue;
